@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Угадай Число</title>
+    <script>
+        let minNumber, maxNumber, answerNumber, countQuestions;
+
+        function startGame() {
+            minNumber = parseInt(prompt("Введите минимальное значение:", "0"));
+            maxNumber = parseInt(prompt("Введите максимальное значение:", "100"));
+            answerNumber = Math.floor((minNumber + maxNumber) / 2);
+            countQuestions = 0;
+            updateDisplay("Начинаем угадывание!");
+            askQuestion();
+        }
+
+        function askQuestion() {
+            countQuestions++;
+            const answerPhrase = generateQuestionPhrase(answerNumber);
+            updateDisplay(`Ваше число ${answerPhrase}?`);
+        }
+
+        function generateQuestionPhrase(number) {
+            if (Math.random() > 0.5) {
+                return `равно ${numberToText(number)}?`;
+            } else {
+                return `больше или меньше ${numberToText(number)}?`;
+            }
+        }
+
+        function numberToText(number) {
+            // Простая реализация, улучшите по необходимости
+            const units = ["ноль", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять"];
+            const teens = ["десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"];
+            const tens = ["", "", "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто"];
+            const hundreds = ["", "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"];
+
+            let text = "";
+
+            if (number < 0) {
+                text = "минус ";
+                number = -number;
+            }
+
+            if (number < 10) {
+                text += units[number];
+            } else if (number < 20) {
+                text += teens[number - 10];
+            } else if (number < 100) {
+                text += tens[Math.floor(number / 10)];
+                if (number % 10 > 0) text += " " + units[number % 10];
+            } else if (number < 1000) {
+                text += hundreds[Math.floor(number / 100)];
+                let remainder = number % 100;
+                if (remainder > 0) {
+                    if (remainder < 10) {
+                        text += " " + units[remainder];
+                    } else if (remainder < 20) {
+                        text += " " + teens[remainder - 10];
+                    } else {
+                        text += " " + tens[Math.floor(remainder / 10)];
+                        if (remainder % 10 > 0) text += " " + units[remainder % 10];
+                    }
+                }
+            }
+            return text;
+        }
+
+        function handleUserAnswer(isGreater) {
+            if (isGreater) {
+                minNumber = answerNumber + 1;
+            } else {
+                maxNumber = answerNumber - 1;
+            }
+            if (minNumber > maxNumber) {
+                updateDisplay("Что-то пошло не так. Начнем заново.");
+                startGame();
+                return;
+            }
+            answerNumber = Math.floor((minNumber + maxNumber) / 2);
+            askQuestion();
+        }
+
+        function userGuessed() {
+            updateDisplay(`Угадал за ${countQuestions} вопросов!`);
+        }
+
+        function updateDisplay(message) {
+            document.getElementById("gameStatus").innerText = message;
+        }
+    </script>
+</head>
+<body>
+    <h1>Угадай Число</h1>
+    <div id="gameStatus">Нажмите "Начать игру"</div>
+    <button onclick="startGame()">Начать игру</button>
+    <button onclick="handleUserAnswer(true)">Больше</button>
+    <button onclick="handleUserAnswer(false)">Меньше</button>
+    <button onclick="userGuessed()">Угадал</button>
+</body>
+</html>
